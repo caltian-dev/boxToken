@@ -1,12 +1,12 @@
-require("dotenv").config();
+const http = require("http");
 const axios = require("axios");
 const querystring = require("querystring");
 
-// const CLIENT_ID = process.env.BOX_CLIENT_ID;
 const CLIENT_ID = "aji1cfqt0qonc8hcig7hvhesl85vrqbk";
-// const CLIENT_SECRET = process.env.BOX_CLIENT_SECRET;
 const CLIENT_SECRET = "cb05EjUK8AYSUJAmgDotZ2KcGff245if";
 const TOKEN_URL = "https://api.box.com/oauth2/token";
+const hostname = "127.0.0.1";
+const port = 3000;
 
 async function getToken() {
   try {
@@ -30,20 +30,6 @@ async function getToken() {
     console.log("Access Token:", response.data);
 
     return accessToken;
-
-    // // Refresh token
-    // const newData = querystring.stringify({
-    //   grant_type: "client_credentials", // Use client credentials grant type
-    //   client_id: CLIENT_ID, // Your Box App Client ID
-    //   client_secret: CLIENT_SECRET, // Your Box App Client Secret
-    //   refresh_token: accessToken,
-    // });
-
-    // const newResponse = await axios.post(TOKEN_URL, data, { headers });
-    // const refreshToken = newResponse.data.access_token;
-    // console.log("Refresh Token:", refreshToken);
-
-    // return refreshToken;
   } catch (error) {
     console.error(
       "Error generating access token:",
@@ -53,5 +39,16 @@ async function getToken() {
   }
 }
 
-// Call the function to get the token
-module.exports = getToken;
+const server = http.createServer(async (req, res) => {
+  // Set the response HTTP header
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "text/plain");
+
+  // Send the response body
+  const token = await getToken();
+  res.end(token);
+});
+
+server.listen(port, hostname, () => {
+  console.log(`Server running at http://${hostname}:${port}/`);
+});
