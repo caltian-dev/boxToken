@@ -2,14 +2,8 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/getToken.js",
+      "src": "index.js",
       "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/getToken",
-      "dest": "/api/getToken.js"
     }
   ]
 }
