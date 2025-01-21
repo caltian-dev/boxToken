@@ -54,4 +54,4 @@ async function getToken() {
 }
 
 // Call the function to get the token
-export default getToken;
+module.exports = getToken;
