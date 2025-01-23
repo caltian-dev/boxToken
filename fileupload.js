@@ -7,8 +7,8 @@ const TOKEN_URL = "https://api.box.com/oauth2/token";
 const UPLOAD_URL = "https://upload.box.com/api/2.0/files/content";
 const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
 const CLIENT_SECRET = "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp"; // Replace with your client secret
-const REFRESH_TOKEN =
-  "WC3h5vO07TnDlfCVpK0KcdU0KtFpxefwtZYc3wUYs3nSpJR8FdridB1vv3Usmj4m";
+let REFRESH_TOKEN =
+  "FPhRUk3ZHn7g10F955aSlFEAK18IoCnTMdvFpY9GzjPD5xEiHsEYmHTUxpvSIIWM";
 const FILE_PATH = "C:/2.txt";
 const FOLDER_ID = "0";
 
@@ -27,6 +27,7 @@ async function uploadFile() {
     });
 
     const accessToken = tokenResponse.data.access_token;
+    REFRESH_TOKEN = tokenResponse.data.refresh_token;
     console.log("Access Token:", accessToken);
 
     // Step 2: Upload File

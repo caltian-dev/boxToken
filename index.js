@@ -4,8 +4,8 @@ const querystring = require("querystring");
 
 const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
 const CLIENT_SECRET = "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp"; // Replace with your client secret
-const REFRESH_TOKEN =
-  "WC3h5vO07TnDlfCVpK0KcdU0KtFpxefwtZYc3wUYs3nSpJR8FdridB1vv3Usmj4m";
+let REFRESH_TOKEN =
+  "Qny7vUVxj7eB73TICpW90lRogHWTCVTeEgDlOGWhZjsln3agR6AAGP7vpZHKGT1X";
 const TOKEN_URL = "https://api.box.com/oauth2/token";
 const hostname = "127.0.0.1";
 const port = 3000;
@@ -34,6 +34,7 @@ const server = http.createServer(async (req, res) => {
 
     // Get access token from the response
     const accessToken = response.data.access_token;
+    REFRESH_TOKEN = response.data.refresh_token;
     console.log("Access Token:", response.data);
 
     // Send the response body
