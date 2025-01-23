@@ -5,13 +5,18 @@ const querystring = require("querystring");
 const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
 const CLIENT_SECRET = "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp"; // Replace with your client secret
 let REFRESH_TOKEN =
-  "T3hETd9XGP46ZsCJzg8KyBkbkjAdbWG1gErFZEJAnY3GySyxUNsNsmIeCeP9d1hS";
+  "pAUw2TvF4pkRZVCxmi6aka6wNhbupxvLf6GX24EQaeBeMzS5AmPhn1FrnAmhOf8z";
 const TOKEN_URL = "https://api.box.com/oauth2/token";
 const hostname = "127.0.0.1";
 const port = 3000;
 
 const server = http.createServer(async (req, res) => {
   try {
+    if (req.url !== "/") {
+      res.statusCode = 404;
+      res.end("Not Found");
+      return;
+    }
     // Set the response HTTP header
     res.statusCode = 200;
     res.setHeader("Content-Type", "text/plain");
