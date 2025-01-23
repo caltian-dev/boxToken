@@ -2,19 +2,26 @@ const http = require("http");
 const axios = require("axios");
 const querystring = require("querystring");
 
-const CLIENT_ID = "aji1cfqt0qonc8hcig7hvhesl85vrqbk";
-const CLIENT_SECRET = "cb05EjUK8AYSUJAmgDotZ2KcGff245if";
+const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
+const CLIENT_SECRET = "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp"; // Replace with your client secret
+const REFRESH_TOKEN =
+  "WC3h5vO07TnDlfCVpK0KcdU0KtFpxefwtZYc3wUYs3nSpJR8FdridB1vv3Usmj4m";
 const TOKEN_URL = "https://api.box.com/oauth2/token";
 const hostname = "127.0.0.1";
 const port = 3000;
 
-async function getToken() {
+const server = http.createServer(async (req, res) => {
   try {
+    // Set the response HTTP header
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "text/plain");
+
     // Format the data for application/x-www-form-urlencoded
     const data = querystring.stringify({
-      grant_type: "client_credentials", // Use client credentials grant type
-      client_id: CLIENT_ID, // Your Box App Client ID
-      client_secret: CLIENT_SECRET, // Your Box App Client Secret
+      grant_type: "refresh_token",
+      refresh_token: REFRESH_TOKEN,
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
     });
 
     // Set headers including content-type
@@ -29,7 +36,8 @@ async function getToken() {
     const accessToken = response.data.access_token;
     console.log("Access Token:", response.data);
 
-    return accessToken;
+    // Send the response body
+    res.end(accessToken);
   } catch (error) {
     console.error(
       "Error generating access token:",
@@ -37,16 +45,6 @@ async function getToken() {
     );
     throw new Error("Failed to get access token");
   }
-}
-
-const server = http.createServer(async (req, res) => {
-  // Set the response HTTP header
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "text/plain");
-
-  // Send the response body
-  const token = await getToken();
-  res.end(token);
 });
 
 server.listen(port, hostname, () => {
