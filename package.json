@@ -21,6 +21,5 @@
   },
   "devDependencies": {
     "vercel": "^30.0.0"
-  },
-  "type": "module"
+  }
 }
