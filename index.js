@@ -6,74 +6,107 @@ const querystring = require("querystring");
 const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
 const CLIENT_SECRET = "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp"; // Replace with your client secret
 const REFRESH_TOKEN =
-  "sbTxJEOCiUUAM3V3QhrCadPCoxwOJeov5GiGIEpnsyNPL98M8PzqNNk1DkNYYHBI";
+  "mvcrVFW9NaKMPZoIX8KXuyiml6mdZBuxfXOP2s5si2WjHsYmrC7bevXPZNvyWrMH";
 const TOKEN_URL = "https://api.box.com/oauth2/token";
 const hostname = "127.0.0.1";
 const port = 3000;
-const REFRESH_TOKEN_FILE = "token.txt";
 
-// Function to store a variable value in a .txt file
-async function storeValue(filename, value) {
-  fs.writeFile(filename, value, "utf8", (err) => {
-    if (err) {
-      console.error("Error writing to file:", err);
-    } else {
-      console.log("Value stored successfully.");
+const sqlite3 = require("sqlite3").verbose();
+const db = new sqlite3.Database("./tokens.db");
+
+// Create a table for storing the refresh token
+db.serialize(() => {
+  db.run(`CREATE TABLE IF NOT EXISTS tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    refresh_token TEXT NOT NULL
+  )`);
+});
+
+// Function to retrieve the refresh token from the database
+function getRefreshToken(callback) {
+  db.get(
+    "SELECT refresh_token FROM tokens ORDER BY id DESC LIMIT 1",
+    (err, row) => {
+      if (err) {
+        console.error("Error retrieving token:", err);
+        callback(err, null);
+      } else {
+        callback(null, row ? row.refresh_token : null);
+      }
     }
-  });
+  );
 }
 
-const server = http.createServer(async (req, res) => {
-  try {
-    if (req.url !== "/") {
-      res.statusCode = 404;
-      res.end("Not Found");
+// Function to update or insert a new refresh token
+function storeRefreshToken(refreshToken, callback) {
+  db.run(
+    "INSERT INTO tokens (refresh_token) VALUES (?)",
+    [refreshToken],
+    (err) => {
+      if (err) {
+        console.error("Error storing token:", err);
+        callback(err);
+      } else {
+        console.log("Refresh token stored successfully.");
+        callback(null);
+      }
+    }
+  );
+}
+
+const server = http.createServer((req, res) => {
+  if (req.url !== "/") {
+    res.statusCode = 404;
+    res.end("Not Found");
+    return;
+  }
+
+  res.statusCode = 200;
+  res.setHeader("Content-Type", "text/plain");
+
+  getRefreshToken(async (err, refreshToken) => {
+    if (err) {
+      res.end("Error retrieving token.");
       return;
     }
-    // Set the response HTTP header
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
 
-    let refresh_token = REFRESH_TOKEN;
-    fs.readFile(REFRESH_TOKEN_FILE, "utf8", async (err, token) => {
-      if (err) {
-        console.error("Error reading file:", err);
-      } else {
-        console.log("Value retrieved successfully.");
-        refresh_token = token || REFRESH_TOKEN;
-      }
-      // Format the data for application/x-www-form-urlencoded
-      console.log("Refresh_token", refresh_token);
-      const data = querystring.stringify({
-        grant_type: "refresh_token",
-        refresh_token: refresh_token,
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
+    refreshToken = refreshToken || REFRESH_TOKEN; // Fallback if no token in DB
+    console.log("Current Refresh Token:", refreshToken);
+
+    const data = querystring.stringify({
+      grant_type: "refresh_token",
+      refresh_token: refreshToken,
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET,
+    });
+
+    try {
+      const response = await axios.post(TOKEN_URL, data, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
       });
 
-      // Set headers including content-type
-      const headers = {
-        "Content-Type": "application/x-www-form-urlencoded", // Specify Content-Type header
-      };
-
-      // Make POST request with formatted data and headers
-      const response = await axios.post(TOKEN_URL, data, { headers });
-
-      // Get access token from the response
+      const newRefreshToken = response.data.refresh_token;
       const accessToken = response.data.access_token;
-      await storeValue(REFRESH_TOKEN_FILE, response.data.refresh_token);
-      console.log("Access Token:", response.data);
 
-      // Send the response body
+      // Store the new refresh token in the database
+      storeRefreshToken(newRefreshToken, (storeErr) => {
+        if (storeErr) {
+          console.error("Error storing new refresh token.");
+        } else {
+          console.log("New Refresh Token Stored:", newRefreshToken);
+        }
+      });
+
+      // Send the access token as the response
       res.end(accessToken);
-    });
-  } catch (error) {
-    console.error(
-      "Error generating access token:",
-      error.response ? error.response.data : error.message
-    );
-    throw new Error("Failed to get access token");
-  }
+    } catch (error) {
+      console.error(
+        "Error refreshing token:",
+        error.response?.data || error.message
+      );
+      res.end("Error refreshing token.");
+    }
+  });
 });
 
 server.listen(port, hostname, () => {

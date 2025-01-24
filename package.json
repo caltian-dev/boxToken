@@ -15,7 +15,8 @@
     "axios": "^1.7.9",
     "box-node-sdk": "^3.7.1",
     "dotenv": "^16.4.7",
-    "querystring": "^0.2.1"
+    "querystring": "^0.2.1",
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "vercel": "^30.0.0"
