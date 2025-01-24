@@ -6,7 +6,7 @@ const querystring = require("querystring");
 const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
 const CLIENT_SECRET = "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp"; // Replace with your client secret
 const REFRESH_TOKEN =
-  "mvcrVFW9NaKMPZoIX8KXuyiml6mdZBuxfXOP2s5si2WjHsYmrC7bevXPZNvyWrMH";
+  "pY7rS7nqwHKSvQKI4o1zmKhzuOwtZviLg9z3VL58WlbPKEuS8K2PcCiVprkKzeRV";
 const TOKEN_URL = "https://api.box.com/oauth2/token";
 const hostname = "127.0.0.1";
 const port = 3000;
