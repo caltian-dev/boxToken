@@ -5,5 +5,11 @@
       "src": "index.js",
       "use": "@vercel/node"
     }
-  ]
+  ],
+  "env": {
+    "MONGO_URI": "mongodb+srv://daiki:123@cluster0.wfaub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+    "CLIENT_ID": "o7xpgssqmi6ztyurh7icr8orqq6asrbt",
+    "CLIENT_SECRET": "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp",
+    "REFRESH_TOKEN": "pY7rS7nqwHKSvQKI4o1zmKhzuOwtZviLg9z3VL58WlbPKEuS8K2PcCiVprkKzeRV"
+  }
 }
