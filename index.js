@@ -11,47 +11,49 @@ const TOKEN_URL = "https://api.box.com/oauth2/token";
 const hostname = "127.0.0.1";
 const port = 3000;
 
-const sqlite3 = require("sqlite3").verbose();
-const db = new sqlite3.Database("./tokens.db");
+// MongoDB connection details
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const mongoUri =
+  "mongodb+srv://daiki:123@cluster0.wfaub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; // Replace with your MongoDB Atlas connection string
+const dbName = "boxtoken"; // Replace with your database name
+const collectionName = "tokens"; // Replace with your collection name
 
-// Create a table for storing the refresh token
-db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS tokens (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    refresh_token TEXT NOT NULL
-  )`);
+// MongoDB client setup
+const client = new MongoClient(mongoUri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  },
 });
 
-// Function to retrieve the refresh token from the database
-function getRefreshToken(callback) {
-  db.get(
-    "SELECT refresh_token FROM tokens ORDER BY id DESC LIMIT 1",
-    (err, row) => {
-      if (err) {
-        console.error("Error retrieving token:", err);
-        callback(err, null);
-      } else {
-        callback(null, row ? row.refresh_token : null);
-      }
-    }
-  );
+// Function to retrieve the refresh token from MongoDB
+async function getRefreshToken(callback) {
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+    const token = await collection.findOne({}, { sort: { _id: -1 } }); // Get the most recent token
+    callback(null, token ? token.refresh_token : null);
+  } catch (err) {
+    console.error("Error retrieving token from MongoDB:", err);
+    callback(err, null);
+  }
 }
 
-// Function to update or insert a new refresh token
-function storeRefreshToken(refreshToken, callback) {
-  db.run(
-    "INSERT INTO tokens (refresh_token) VALUES (?)",
-    [refreshToken],
-    (err) => {
-      if (err) {
-        console.error("Error storing token:", err);
-        callback(err);
-      } else {
-        console.log("Refresh token stored successfully.");
-        callback(null);
-      }
-    }
-  );
+// Function to store the refresh token in MongoDB
+async function storeRefreshToken(refreshToken, callback) {
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const collection = db.collection(collectionName);
+    await collection.insertOne({ refresh_token: refreshToken });
+    console.log("Refresh token stored successfully.");
+    callback(null);
+  } catch (err) {
+    console.error("Error storing token in MongoDB:", err);
+    callback(err);
+  }
 }
 
 const server = http.createServer((req, res) => {
@@ -88,7 +90,7 @@ const server = http.createServer((req, res) => {
       const newRefreshToken = response.data.refresh_token;
       const accessToken = response.data.access_token;
 
-      // Store the new refresh token in the database
+      // Store the new refresh token in MongoDB
       storeRefreshToken(newRefreshToken, (storeErr) => {
         if (storeErr) {
           console.error("Error storing new refresh token.");
