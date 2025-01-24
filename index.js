@@ -7,12 +7,8 @@ let REFRESH_TOKEN =
   "T3hETd9XGP46ZsCJzg8KyBkbkjAdbWG1gErFZEJAnY3GySyxUNsNsmIeCeP9d1hS";
 const TOKEN_URL = "https://api.box.com/oauth2/token";
 
-export default async (req, res) => {
+async function getToken() {
   try {
-    // Set the response HTTP header
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "text/plain");
-
     // Format the data for application/x-www-form-urlencoded
     const data = querystring.stringify({
       grant_type: "refresh_token",
@@ -35,7 +31,7 @@ export default async (req, res) => {
     console.log("Access Token:", response.data);
 
     // Send the response body
-    res.end(accessToken);
+    return accessToken;
   } catch (error) {
     console.error(
       "Error generating access token:",
@@ -43,4 +39,5 @@ export default async (req, res) => {
     );
     throw new Error("Failed to get access token");
   }
-};
+}
+getToken();
