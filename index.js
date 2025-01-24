@@ -49,8 +49,18 @@ async function storeRefreshToken(refreshToken) {
   }
 }
 
-export default async function handler() {
+export default async function handler(req, res) {
+  if (req.url !== "/") {
+    res.statusCode = 404;
+    res.end("Not Found");
+    return;
+  }
+
   try {
+    // Set the response HTTP header
+    res.statusCode = 200;
+    res.setHeader("Content-Type", "text/plain");
+
     // Retrieve the refresh token from MongoDB
     let refreshToken = await getRefreshToken();
     refreshToken = refreshToken || REFRESH_TOKEN; // Fallback if no token in DB
@@ -78,11 +88,12 @@ export default async function handler() {
     console.log("New Refresh Token Stored:", newRefreshToken);
 
     // Respond with the access token
-    return accessToken;
+    res.end(accessToken);
   } catch (error) {
     console.error(
       "Error refreshing token:",
       error.response?.data || error.message
     );
+    throw new Error("Failed to get refresh token");
   }
 }
