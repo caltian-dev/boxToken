@@ -1,18 +1,18 @@
 import axios from "axios";
 import querystring from "querystring";
 
-const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
-const CLIENT_SECRET = "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp"; // Replace with your client secret
-const REFRESH_TOKEN =
-  "pY7rS7nqwHKSvQKI4o1zmKhzuOwtZviLg9z3VL58WlbPKEuS8K2PcCiVprkKzeRV";
-const TOKEN_URL = "https://api.box.com/oauth2/token";
-
 // MongoDB connection details
 import { MongoClient, ServerApiVersion } from "mongodb";
 const mongoUri =
   "mongodb+srv://daiki:123@cluster0.wfaub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; // Replace with your MongoDB Atlas connection string
 const dbName = "boxtoken"; // Replace with your database name
 const collectionName = "tokens"; // Replace with your collection name
+
+const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
+const CLIENT_SECRET = "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp"; // Replace with your client secret
+const REFRESH_TOKEN =
+  "pY7rS7nqwHKSvQKI4o1zmKhzuOwtZviLg9z3VL58WlbPKEuS8K2PcCiVprkKzeRV"; // Default refresh token
+const TOKEN_URL = "https://api.box.com/oauth2/token";
 
 // MongoDB client setup
 const client = new MongoClient(mongoUri, {
@@ -49,20 +49,14 @@ async function storeRefreshToken(refreshToken) {
   }
 }
 
-async function getToken() {
+export default async function handler() {
   try {
-    // if (req.url !== "/") {
-    //   res.statusCode = 404;
-    //   res.end("Not Found");
-    //   return;
-    // }
     // Retrieve the refresh token from MongoDB
     let refreshToken = await getRefreshToken();
     refreshToken = refreshToken || REFRESH_TOKEN; // Fallback if no token in DB
 
     console.log("Current Refresh Token:", refreshToken);
 
-    // Format the data for application/x-www-form-urlencoded
     const data = querystring.stringify({
       grant_type: "refresh_token",
       refresh_token: refreshToken,
@@ -70,15 +64,11 @@ async function getToken() {
       client_secret: CLIENT_SECRET,
     });
 
-    // Set headers including content-type
-    const headers = {
-      "Content-Type": "application/x-www-form-urlencoded", // Specify Content-Type header
-    };
+    // Request a new access token
+    const response = await axios.post(TOKEN_URL, data, {
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    });
 
-    // Make POST request with formatted data and headers
-    const response = await axios.post(TOKEN_URL, data, { headers });
-
-    // Get access token from the response
     const newRefreshToken = response.data.refresh_token;
     const accessToken = response.data.access_token;
 
@@ -87,15 +77,12 @@ async function getToken() {
 
     console.log("New Refresh Token Stored:", newRefreshToken);
 
-    // Send the response body
+    // Respond with the access token
     return accessToken;
   } catch (error) {
     console.error(
-      "Error generating access token:",
-      error.response ? error.response.data : error.message
+      "Error refreshing token:",
+      error.response?.data || error.message
     );
-    throw new Error("Failed to get access token");
   }
 }
-
-export default getToken;
