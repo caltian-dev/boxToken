@@ -1,4 +1,4 @@
-import axios from "./node_modules/axios";
+import axios from "axios";
 import querystring from "querystring";
 
 const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
