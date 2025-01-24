@@ -51,11 +51,11 @@ async function storeRefreshToken(refreshToken) {
 
 async function getToken() {
   try {
-    if (req.url !== "/") {
-      res.statusCode = 404;
-      res.end("Not Found");
-      return;
-    }
+    // if (req.url !== "/") {
+    //   res.statusCode = 404;
+    //   res.end("Not Found");
+    //   return;
+    // }
     // Retrieve the refresh token from MongoDB
     let refreshToken = await getRefreshToken();
     refreshToken = refreshToken || REFRESH_TOKEN; // Fallback if no token in DB
