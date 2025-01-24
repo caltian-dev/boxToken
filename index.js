@@ -1,5 +1,5 @@
-const axios = require("./node_modules/axios");
-const querystring = require("querystring");
+import axios from "./node_modules/axios";
+import querystring from "querystring";
 
 const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
 const CLIENT_SECRET = "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp"; // Replace with your client secret
@@ -8,7 +8,7 @@ const REFRESH_TOKEN =
 const TOKEN_URL = "https://api.box.com/oauth2/token";
 
 // MongoDB connection details
-const { MongoClient, ServerApiVersion } = require("mongodb");
+import { MongoClient, ServerApiVersion } from "mongodb";
 const mongoUri =
   "mongodb+srv://daiki:123@cluster0.wfaub.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; // Replace with your MongoDB Atlas connection string
 const dbName = "boxtoken"; // Replace with your database name
