@@ -1,18 +1,17 @@
 {
-  "name": "boxGetToken",
+  "name": "boxgettoken",
   "version": "1.0.0",
-  "description": "A project to refresh Box OAuth token",
-  "main": "api/refresh-token.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "vercel dev",
-    "deploy": "vercel --prod"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
-    "axios": "^0.26.1",
-    "mongodb": "^4.1.0",
+    "axios": "^1.7.9",
+    "mongodb": "^6.12.0",
     "querystring": "^0.2.1"
-  },
-  "engines": {
-    "node": "16.x"
   }
 }
