@@ -11,7 +11,7 @@ const collectionName = "tokens"; // Replace with your collection name
 const CLIENT_ID = "o7xpgssqmi6ztyurh7icr8orqq6asrbt"; // Replace with your client ID
 const CLIENT_SECRET = "rf7oeCzxfSeTYhnmYvJ4I27XCfCx0MVp"; // Replace with your client secret
 const REFRESH_TOKEN =
-  "pY7rS7nqwHKSvQKI4o1zmKhzuOwtZviLg9z3VL58WlbPKEuS8K2PcCiVprkKzeRV"; // Default refresh token
+  "qAstcZg2lwNPdQyVoRSRndPmf6buxvEchRnAajyAwHpCq1jxN8KPTnUaYRJoZhPy"; // Default refresh token
 const TOKEN_URL = "https://api.box.com/oauth2/token";
 
 // MongoDB client setup
